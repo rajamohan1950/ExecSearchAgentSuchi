@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { randomUUID } from "crypto";
-import pdfParse from "pdf-parse";
+const pdfParse = require("pdf-parse");
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-change-in-production";
 const MAX_PDF_SIZE = 10 * 1024 * 1024; // 10MB
