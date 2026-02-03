@@ -1,4 +1,5 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+// Use Next.js API routes if no external API URL is set (Vercel serverless functions)
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
 function getToken(): string | null {
   if (typeof window === "undefined") return null;
@@ -27,7 +28,8 @@ async function apiFetch(path: string, options: RequestInit = {}): Promise<Respon
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_BASE}${path}`, {
+  const url = API_BASE ? `${API_BASE}${path}` : path;
+  const response = await fetch(url, {
     ...options,
     headers,
   });
@@ -43,7 +45,8 @@ async function apiFetch(path: string, options: RequestInit = {}): Promise<Respon
 }
 
 export async function login(email: string): Promise<{ access_token: string }> {
-  const res = await fetch(`${API_BASE}/api/v1/auth/login`, {
+  const url = API_BASE ? `${API_BASE}/api/v1/auth/login` : "/api/v1/auth/login";
+  const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email }),

@@ -23,8 +23,18 @@ export default function LandingPage() {
     try {
       await login(email);
       setStep("upload");
-    } catch {
-      setError("Failed to sign in. Please try again.");
+    } catch (err: any) {
+      const msg = err?.message || "";
+      const isNetwork =
+        msg.includes("fetch") ||
+        msg.includes("Network") ||
+        msg.includes("Failed to fetch") ||
+        msg.includes("CORS");
+      setError(
+        isNetwork
+          ? "Sign in failed. If you're using the cloud app, ensure the API is deployed and CORS allows this origin."
+          : "Failed to sign in. Please try again."
+      );
     }
   }
 

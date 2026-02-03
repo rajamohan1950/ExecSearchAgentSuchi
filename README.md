@@ -21,6 +21,17 @@ Automatic deployments run on every push to your connected branch.
      - No trailing slash. The app rewrites `/api/v1/*` to this URL.
 6. Click **Deploy**.
 
+### Email sign-in from the cloud
+
+For email sign-in to work when the frontend is on Vercel:
+
+1. **Deploy your API** (api-gateway) somewhere reachable (e.g. Railway, Render, Fly.io).
+2. **Vercel env:** set `NEXT_PUBLIC_API_URL` to that API URL (e.g. `https://your-api.railway.app`).
+3. **API env:** set `CORS_ORIGINS` to your Vercel frontend URL(s), comma-separated, e.g.:
+   - `https://frontend-6uduhrapt-rajamohans-projects.vercel.app`
+   - Or use your custom Vercel domain. Preview deployments need their URL in `CORS_ORIGINS` too if you want to test PRs.
+4. Redeploy the API after changing `CORS_ORIGINS`; redeploy the frontend after changing `NEXT_PUBLIC_API_URL`.
+
 ### 2. Automatic deployments
 
 - **Production:** every push to `main` (or your default branch) deploys to production.

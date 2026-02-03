@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     jwt_expiry_hours: int = 24 * 7  # 1 week
 
+    # CORS: comma-separated origins (e.g. https://yourapp.vercel.app)
+    cors_origins: str = ""
+
     class Config:
         env_prefix = ""
 
