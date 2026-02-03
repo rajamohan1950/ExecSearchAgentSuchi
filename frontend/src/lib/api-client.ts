@@ -60,10 +60,25 @@ export async function login(email: string): Promise<{ access_token: string }> {
 export async function uploadPdf(file: File) {
   const formData = new FormData();
   formData.append("file", file);
-  const res = await apiFetch("/api/v1/profiles/upload", {
+  const token = getToken();
+  const url = API_BASE ? `${API_BASE}/api/v1/profiles/upload` : "/api/v1/profiles/upload";
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  // Don't set Content-Type for FormData - browser sets it with boundary
+  const res = await fetch(url, {
     method: "POST",
+    headers,
     body: formData,
   });
+  if (res.status === 401) {
+    clearToken();
+    if (typeof window !== "undefined") {
+      window.location.href = "/login";
+    }
+    throw new Error("Unauthorized");
+  }
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: "Upload failed" }));
     throw new Error(err.detail || "Upload failed");
