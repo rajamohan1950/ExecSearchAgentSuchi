@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: "standalone",
+  // Use standalone for Docker; Vercel uses its own serverless build
+  ...(process.env.VERCEL ? {} : { output: "standalone" }),
   async rewrites() {
     return [
       {
