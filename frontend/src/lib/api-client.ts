@@ -1,4 +1,5 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+// Use relative URLs for Vercel (Next.js API routes), or external API if set
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
 function getToken(): string | null {
   if (typeof window === "undefined") return null;
@@ -27,7 +28,8 @@ async function apiFetch(path: string, options: RequestInit = {}): Promise<Respon
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_BASE}${path}`, {
+  const url = API_BASE ? `${API_BASE}${path}` : path;
+  const response = await fetch(url, {
     ...options,
     headers,
   });
@@ -43,7 +45,8 @@ async function apiFetch(path: string, options: RequestInit = {}): Promise<Respon
 }
 
 export async function login(email: string): Promise<{ access_token: string }> {
-  const res = await fetch(`${API_BASE}/api/v1/auth/login`, {
+  const url = API_BASE ? `${API_BASE}/api/v1/auth/login` : "/api/v1/auth/login";
+  const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email }),
@@ -57,10 +60,24 @@ export async function login(email: string): Promise<{ access_token: string }> {
 export async function uploadPdf(file: File) {
   const formData = new FormData();
   formData.append("file", file);
-  const res = await apiFetch("/api/v1/profiles/upload", {
+  const token = getToken();
+  const url = API_BASE ? `${API_BASE}/api/v1/profiles/upload` : "/api/v1/profiles/upload";
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  const res = await fetch(url, {
     method: "POST",
+    headers,
     body: formData,
   });
+  if (res.status === 401) {
+    clearToken();
+    if (typeof window !== "undefined") {
+      window.location.href = "/login";
+    }
+    throw new Error("Unauthorized");
+  }
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: "Upload failed" }));
     throw new Error(err.detail || "Upload failed");

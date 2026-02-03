@@ -3,12 +3,18 @@ const nextConfig = {
   // Use standalone for Docker; Vercel uses its own serverless build
   ...(process.env.VERCEL ? {} : { output: "standalone" }),
   async rewrites() {
-    return [
-      {
-        source: "/api/v1/:path*",
-        destination: `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/v1/:path*`,
-      },
-    ];
+    // Only proxy if NEXT_PUBLIC_API_URL is set (for local dev with external API)
+    // Otherwise use Next.js API routes (Vercel serverless functions)
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    if (apiUrl) {
+      return [
+        {
+          source: "/api/v1/:path*",
+          destination: `${apiUrl}/api/v1/:path*`,
+        },
+      ];
+    }
+    return [];
   },
 };
 
