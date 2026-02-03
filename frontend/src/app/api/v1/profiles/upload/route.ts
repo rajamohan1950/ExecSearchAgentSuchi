@@ -89,7 +89,20 @@ function extractBasicInfo(text: string): any {
 
 export async function POST(request: NextRequest) {
   try {
-    const { email } = verifyToken(request.headers.get("authorization"));
+    // Verify authentication first
+    const authHeader = request.headers.get("authorization");
+    if (!authHeader) {
+      return NextResponse.json({ detail: "Authorization header required" }, { status: 401 });
+    }
+    
+    let email: string;
+    try {
+      const result = verifyToken(authHeader);
+      email = result.email;
+    } catch (authError: any) {
+      return NextResponse.json({ detail: authError.message || "Authentication failed" }, { status: 401 });
+    }
+    
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
     if (!file || !file.name.toLowerCase().endsWith(".pdf")) {
@@ -153,9 +166,11 @@ export async function POST(request: NextRequest) {
       created_at: profileVersion.created_at.toISOString(),
     });
   } catch (error: any) {
+    console.error("Upload error:", error);
     if (error.message === "Invalid authorization header" || error.message === "Invalid token" || error.message === "Token expired") {
       return NextResponse.json({ detail: error.message }, { status: 401 });
     }
-    return NextResponse.json({ detail: error.message || "Upload failed" }, { status: 500 });
+    const errorMessage = error.message || error.toString() || "Upload failed";
+    return NextResponse.json({ detail: errorMessage }, { status: 500 });
   }
 }
