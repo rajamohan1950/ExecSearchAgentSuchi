@@ -115,10 +115,19 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(arrayBuffer);
     let pdfText: string;
     try {
+      // pdf-parse might fail in serverless, wrap in try-catch with detailed error
       const pdfData = await pdfParse(buffer);
-      pdfText = pdfData.text;
+      pdfText = pdfData.text || "";
+      if (!pdfText || pdfText.trim().length === 0) {
+        return NextResponse.json({ detail: "PDF appears to be empty or unreadable" }, { status: 400 });
+      }
     } catch (parseError: any) {
-      return NextResponse.json({ detail: `PDF parsing failed: ${parseError.message}` }, { status: 400 });
+      console.error("PDF parse error:", parseError);
+      // Return more detailed error for debugging
+      const errorMsg = parseError.message || parseError.toString() || "Unknown parsing error";
+      return NextResponse.json({ 
+        detail: `PDF parsing failed: ${errorMsg}. File size: ${buffer.length} bytes` 
+      }, { status: 400 });
     }
     const extracted = extractBasicInfo(pdfText);
     const userVersions = profiles.get(email) || [];
