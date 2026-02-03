@@ -1,0 +1,23 @@
+version: "3.9"
+
+# Dev overrides: hot reload via volume mounts
+services:
+  frontend:
+    build:
+      context: ./frontend
+      target: development
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+    environment:
+      - NODE_ENV=development
+
+  api-gateway:
+    volumes:
+      - ./services/api-gateway/app:/app/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  linkedin-parser:
+    volumes:
+      - ./services/linkedin-parser/app:/app/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload
