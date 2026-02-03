@@ -24,7 +24,7 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: CORS_ORIGINS
-        value: https://frontend-9pewj7qbg-rajamohans-projects.vercel.app,https://frontend-*.vercel.app
+        value: https://frontend-6mgbtoy45-rajamohans-projects.vercel.app,https://frontend-*.vercel.app
 
 databases:
   - name: suchi-db
