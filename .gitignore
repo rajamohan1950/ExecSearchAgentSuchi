@@ -36,3 +36,6 @@ minio_data/
 
 # Storage
 uploads/
+
+# Secrets (Gmail OAuth, API keys)
+secrets/

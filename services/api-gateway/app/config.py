@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     jwt_expiry_hours: int = 24 * 7  # 1 week
 
+    # Outreach Agent service
+    outreach_agent_url: str = "http://outreach-agent:8002"
+
     # CORS: comma-separated origins (e.g. https://yourapp.vercel.app)
     cors_origins: str = ""
 

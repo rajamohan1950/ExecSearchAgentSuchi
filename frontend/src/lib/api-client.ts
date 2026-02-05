@@ -115,3 +115,78 @@ export async function getDashboardStats() {
   if (!res.ok) throw new Error("Failed to fetch dashboard");
   return res.json();
 }
+
+// ── Outreach Agent APIs ──────────────────────────────────
+
+export async function uploadFirmsCSV(file: File) {
+  const formData = new FormData();
+  formData.append("file", file);
+  const token = getToken();
+  const url = API_BASE ? `${API_BASE}/api/v1/outreach/firms/bulk-upload` : "/api/v1/outreach/firms/bulk-upload";
+  const headers: Record<string, string> = {};
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  const res = await fetch(url, { method: "POST", headers, body: formData });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: "Upload failed" }));
+    throw new Error(err.detail || "Upload failed");
+  }
+  return res.json();
+}
+
+export async function getFirms(search?: string, status?: string) {
+  const params = new URLSearchParams();
+  if (search) params.set("search", search);
+  if (status) params.set("status", status);
+  const qs = params.toString();
+  const res = await apiFetch(`/api/v1/outreach/firms${qs ? `?${qs}` : ""}`);
+  if (!res.ok) throw new Error("Failed to fetch firms");
+  return res.json();
+}
+
+export async function getFirmDetail(firmId: string) {
+  const res = await apiFetch(`/api/v1/outreach/firms/${firmId}`);
+  if (!res.ok) throw new Error("Failed to fetch firm");
+  return res.json();
+}
+
+export async function getOutreachMetrics() {
+  const res = await apiFetch("/api/v1/outreach/metrics/summary");
+  if (!res.ok) throw new Error("Failed to fetch metrics");
+  return res.json();
+}
+
+export async function getOutreachThreads() {
+  const res = await apiFetch("/api/v1/outreach/threads");
+  if (!res.ok) throw new Error("Failed to fetch threads");
+  return res.json();
+}
+
+export async function getThreadMessages(threadId: string) {
+  const res = await apiFetch(`/api/v1/outreach/threads/${threadId}`);
+  if (!res.ok) throw new Error("Failed to fetch thread");
+  return res.json();
+}
+
+export async function getAgentActions(limit = 50) {
+  const res = await apiFetch(`/api/v1/outreach/metrics/actions?limit=${limit}`);
+  if (!res.ok) throw new Error("Failed to fetch actions");
+  return res.json();
+}
+
+export async function getAgentStatus() {
+  const res = await apiFetch("/api/v1/outreach/agent-status");
+  if (!res.ok) throw new Error("Failed to fetch agent status");
+  return res.json();
+}
+
+export async function triggerOutreach(contactId: string) {
+  const res = await apiFetch(`/api/v1/outreach/trigger/${contactId}`, { method: "POST" });
+  if (!res.ok) throw new Error("Failed to trigger outreach");
+  return res.json();
+}
+
+export async function getDailyBriefings() {
+  const res = await apiFetch("/api/v1/outreach/metrics/briefings");
+  if (!res.ok) throw new Error("Failed to fetch briefings");
+  return res.json();
+}

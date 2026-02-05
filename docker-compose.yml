@@ -54,6 +54,31 @@ services:
       timeout: 5s
       retries: 5
 
+  outreach-agent:
+    build:
+      context: ./services/outreach-agent
+      dockerfile: Dockerfile
+    ports:
+      - "8002:8002"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-suchi}:${POSTGRES_PASSWORD:-suchi_dev_password}@postgres:5432/${POSTGRES_DB:-suchi}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - GMAIL_CREDENTIALS_JSON=/app/secrets/credentials.json
+      - GMAIL_TOKEN_JSON=/app/secrets/token.json
+      - GMAIL_SENDER_EMAIL=${GMAIL_SENDER_EMAIL:-}
+      - RAJAMOHAN_EMAIL=${RAJAMOHAN_EMAIL:-}
+    volumes:
+      - ./secrets:/app/secrets:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/api/v1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   postgres:
     image: postgres:16-alpine
     ports:

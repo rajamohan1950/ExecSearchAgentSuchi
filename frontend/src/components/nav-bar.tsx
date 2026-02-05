@@ -17,6 +17,7 @@ export default function NavBar() {
     { href: "/dashboard", label: "Dashboard" },
     { href: "/profile", label: "Profile" },
     { href: "/upload", label: "Upload" },
+    { href: "/outreach", label: "Outreach" },
   ];
 
   return (

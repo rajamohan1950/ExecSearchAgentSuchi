@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.services.storage_service import storage_service
-from app.routers import health, auth, users, profiles
+from app.routers import health, auth, users, profiles, outreach
 from app.config import settings
 
 logging.basicConfig(level=logging.INFO)
@@ -49,3 +49,4 @@ app.include_router(health.router, prefix="/api/v1")
 app.include_router(auth.router, prefix="/api/v1")
 app.include_router(users.router, prefix="/api/v1")
 app.include_router(profiles.router, prefix="/api/v1")
+app.include_router(outreach.router, prefix="/api/v1")
